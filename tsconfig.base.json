@@ -1,0 +1,19 @@
+// 配置 TypeScript (tsconfig.base.json) 为了让所有子项目继承同一套 TS 配置，
+// 我们在根目录创建一个基础配置
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "useDefineForClassFields": true,
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "strict": true,
+    "jsx": "preserve",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "lib": ["ESNext", "DOM"],
+    "skipLibCheck": true,
+    "noEmit": true,
+    "baseUrl": "."
+  }
+}
