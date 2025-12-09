@@ -78,7 +78,21 @@
           </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+        <!-- Loading 状态 -->
+        <div v-if="loading" class="text-center py-12">
+          <div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent"></div>
+          <p class="mt-4 text-gray-400">加载中...</p>
+        </div>
+
+        <!-- 空状态提示 -->
+        <div v-else-if="articles.length === 0" class="text-center py-12 bg-gray-800/30 rounded-2xl">
+          <div class="text-6xl mb-4">📭</div>
+          <p class="text-xl text-gray-400 mb-2">暂无文章</p>
+          <p class="text-sm text-gray-500">请先启动后端服务并发布文章</p>
+        </div>
+
+        <!-- 文章列表 -->
+        <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
           <article 
             v-for="article in filteredArticles" 
             :key="article.id"
@@ -184,12 +198,23 @@ const skills = [
   { name: 'Node.js', color: 'bg-lime-500/20 text-lime-300 border border-lime-500/30' },
   { name: 'TailwindCSS', color: 'bg-sky-500/20 text-sky-300 border border-sky-500/30' },
   { name: 'Git', color: 'bg-orange-500/20 text-orange-300 border border-orange-500/30' },
-  { name: 'Docker', color: 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30' }
+  { name: 'Docker', color: 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30' },
+  { name: 'Python', color: 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/30' },
+  { name: 'Java', color: 'bg-red-500/20 text-red-300 border border-red-500/30' },
+  { name: 'Ruby', color: 'bg-red-500/20 text-red-300 border border-red-500/30' },
+  { name: 'Swift', color: 'bg-orange-500/20 text-orange-300 border border-orange-500/30' },
+  { name: 'Go', color: 'bg-blue-500/20 text-blue-300 border border-blue-500/30' },
+  { name: 'Rust', color: 'bg-orange-500/20 text-orange-300 border border-orange-500/30' },
+  { name: 'Kotlin', color: 'bg-green-500/20 text-green-300 border border-green-500/30' },
+  { name: 'PHP', color: 'bg-purple-500/20 text-purple-300 border border-purple-500/30' },
 ]
-const currentCategory = ref('全部')
+
+const loading = ref(false)
 
 const articles = ref<any[]>([])
+
 const fetchArticles = async () => {
+  loading.value = true
   try {
     const res: any = await getArticles(1, 100) // 获取前 100 篇文章
     if (res.code === 200) {
@@ -211,6 +236,8 @@ const fetchArticles = async () => {
     }
   } catch (error) {
     console.error('获取文章失败:', error)
+  } finally {
+    loading.value = false
   }
 }
 
@@ -246,11 +273,11 @@ const lifePhotos = [
 ]
 
 const filteredArticles = computed(() => {
-  if (currentCategory.value === '全部') {
+  if (activeCategory.value === '全部') {
     return articles.value
   }
   return articles.value.filter((article: any) =>
-    article.tags.includes(currentCategory.value)
+    article.tags.includes(activeCategory.value)
   )
 })
 // 粒子动画
