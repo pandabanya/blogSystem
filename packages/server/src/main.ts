@@ -13,6 +13,17 @@ async function bootstrap() {
     forbidNonWhitelisted: true,
     transform: true //  自动转换类型（如字符串 "123" 转为数字 123）
   }))
+
+  // 配置 CORS
+  app.enableCors({
+    origin: [
+      'http://localhost:3000',
+      'http://localhost:3001',
+      'https://blog-system-blog.vercel.app',  // 替换为你的 Vercel 域名
+      'https://your-admin.vercel.app'
+    ],
+    credentials: true
+  });
   
   await app.listen(process.env.PORT ?? 3002);
   console.log(`🚀 Server is running on: http://localhost:3002`);
