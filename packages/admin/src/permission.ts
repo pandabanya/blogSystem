@@ -4,10 +4,10 @@ import type { RouteLocationNormalized } from 'vue-router'
 
 const whiteList = ['/login'] // 白名单，不需要登录也能访问
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 router.beforeEach((to: RouteLocationNormalized, _from:RouteLocationNormalized, next:any)=>{
   const userStore = useUserStore()
   const hasToken = userStore.token
-  console.log(_from);
   if(hasToken){
     if(to.path === '/login'){
       next('/')
