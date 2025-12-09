@@ -175,6 +175,10 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import Navbar from '../components/Navbar.vue'
 import { getArticles } from '@/api/article'
+import { getProjects } from '@/api/project'
+import { getLifeMoments } from '@/api/life-moment'
+import { getSkills } from '@/api/skill'
+
 const activeCategory = ref('全部')
 
 const categories = computed(() => {
@@ -190,28 +194,16 @@ const categories = computed(() => {
 })
 const particleCanvas = ref<HTMLCanvasElement | null>(null)
 
-const skills = [
-  { name: 'Vue 3', color: 'bg-green-500/20 text-green-300 border border-green-500/30' },
-  { name: 'TypeScript', color: 'bg-blue-500/20 text-blue-300 border border-blue-500/30' },
-  { name: 'React', color: 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30' },
-  { name: 'Vite', color: 'bg-purple-500/20 text-purple-300 border border-purple-500/30' },
-  { name: 'Node.js', color: 'bg-lime-500/20 text-lime-300 border border-lime-500/30' },
-  { name: 'TailwindCSS', color: 'bg-sky-500/20 text-sky-300 border border-sky-500/30' },
-  { name: 'Git', color: 'bg-orange-500/20 text-orange-300 border border-orange-500/30' },
-  { name: 'Docker', color: 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30' },
-  { name: 'Python', color: 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/30' },
-  { name: 'Java', color: 'bg-red-500/20 text-red-300 border border-red-500/30' },
-  { name: 'Ruby', color: 'bg-red-500/20 text-red-300 border border-red-500/30' },
-  { name: 'Swift', color: 'bg-orange-500/20 text-orange-300 border border-orange-500/30' },
-  { name: 'Go', color: 'bg-blue-500/20 text-blue-300 border border-blue-500/30' },
-  { name: 'Rust', color: 'bg-orange-500/20 text-orange-300 border border-orange-500/30' },
-  { name: 'Kotlin', color: 'bg-green-500/20 text-green-300 border border-green-500/30' },
-  { name: 'PHP', color: 'bg-purple-500/20 text-purple-300 border border-purple-500/30' },
-]
+// 技能数据（动态获取）
+const skills = ref<any[]>([])
 
 const loading = ref(false)
 
 const articles = ref<any[]>([])
+
+const projects = ref<any[]>([])
+
+const lifePhotos = ref<any[]>([])
 
 const fetchArticles = async () => {
   loading.value = true
@@ -259,19 +251,43 @@ const getRandomColor = () => {
   return colors[Math.floor(Math.random() * colors.length)]
 }
 
-const projects = [
-  { name: 'vue3-starter', desc: 'Vue 3 快速启动模板', stars: '1.2k', lang: 'TypeScript', icon: '📦' },
-  { name: 'blog-theme', desc: '极简博客主题', stars: '856', lang: 'Vue', icon: '🎨' },
-  { name: 'cli-tool', desc: '前端脚手架工具', stars: '642', lang: 'Node.js', icon: '⚡' }
-]
+// 获取开源项目数据
+const fetchProjects = async () => {
+  try {
+    const res: any = await getProjects()
+    if (res.code === 200) {
+      projects.value = res.data || []
+    }
+  } catch (error) {
+    console.error('获取项目失败:', error)
+  }
+}
 
-const lifePhotos = [
-  { emoji: '🐱', label: '我家的猫' },
-  { emoji: '📷', label: '摄影爱好' },
-  { emoji: '🏃', label: '跑步健身' },
-  { emoji: '☕', label: '咖啡时光' }
-]
+// 获取生活片段数据
+const fetchLifeMoments = async () => {
+  try {
+    const res: any = await getLifeMoments()
+    if (res.code === 200) {
+      lifePhotos.value = res.data || []
+    }
+  } catch (error) {
+    console.error('获取生活片段失败:', error)
+  }
+}
 
+// 获取技能数据
+const fetchSkills = async () => {
+  try {
+    const res: any = await getSkills()
+    if (res.code === 200) {
+      skills.value = res.data || []
+    }
+  } catch (error) {
+    console.error('获取技能失败:', error)
+  }
+}
+
+// 过滤文章：根据选中的分类筛选文章列表
 const filteredArticles = computed(() => {
   if (activeCategory.value === '全部') {
     return articles.value
@@ -280,6 +296,7 @@ const filteredArticles = computed(() => {
     article.tags.includes(activeCategory.value)
   )
 })
+
 // 粒子动画
 class Particle {
   x: number
@@ -316,7 +333,11 @@ let animationId: number
 const particles: Particle[] = []
 
 onMounted(() => {
+  // 并行加载所有数据
   fetchArticles()
+  fetchProjects()
+  fetchLifeMoments()
+  fetchSkills()
   const canvas = particleCanvas.value
   if (!canvas) return
   

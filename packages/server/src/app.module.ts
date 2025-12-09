@@ -6,6 +6,9 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from './auth/auth.module';
 import { CommentModule } from './comment/comment.module';
 import { CategoryModule } from './category/category.module';
+import { ProjectModule } from './project/project.module';
+import { LifeMomentModule } from './life-moment/life-moment.module';
+import { SkillModule } from './skill/skill.module';
 
 // 根模块（组织应用结构）  将控制器和服务组合在一起，形成功能模块。
 @Module({
@@ -16,7 +19,10 @@ import { CategoryModule } from './category/category.module';
     ArticleModule,
     AuthModule,
     CommentModule, // 评论模块
-    CategoryModule // 分类模块
+    CategoryModule, // 分类模块
+    ProjectModule, // 开源项目模块
+    LifeMomentModule, // 生活片段模块
+    SkillModule // 技能标签模块
   ],
   controllers: [AppController],
   providers: [AppService],
