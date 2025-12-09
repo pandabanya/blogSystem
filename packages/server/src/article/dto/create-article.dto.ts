@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsArray, MinLength, MaxLength } from 'class-validator';
+import { IsString, IsNotEmpty, IsArray, MinLength, MaxLength, IsOptional, IsIn } from 'class-validator';
 
 // DTO = 数据传输对象，定义接口接收的数据格式
 export class CreateArticleDto {
@@ -18,4 +18,9 @@ export class CreateArticleDto {
 
   @IsArray({ message: '标签必须是数组' })
   tags: string[];
+
+  @IsOptional()  // 可选字段
+  @IsString({ message: '状态必须是字符串' })
+  @IsIn(['draft', 'published'], { message: '状态只能是 draft 或 published' })
+  status?: string;
 }

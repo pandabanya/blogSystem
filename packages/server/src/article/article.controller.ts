@@ -9,15 +9,32 @@ import { CurrentUser } from '../auth/user.decorator';
 export class ArticleController {
   constructor(private readonly articleService: ArticleService) {}
 
-  // GET /article?page=1&pageSize=10 - 获取文章列表（支持分页）
+  // GET /article/stats/overview - 获取文章统计数据（需要登录）
+  // 注意：这个路由必须放在 :id 前面，否则 'stats' 会被当作 id
+  @UseGuards(JwtAuthGuard)
+  @Get('stats/overview')
+  getStats() {
+    return this.articleService.getStats();
+  }
+
+  // GET /article/:id/export - 导出单篇文章为 Markdown（需要登录）
+  // 注意：必须放在 :id 路由之前
+  @UseGuards(JwtAuthGuard)
+  @Get(':id/export')
+  exportArticle(@Param('id') id: string) {
+    return this.articleService.exportArticle(id);
+  }
+
+  // GET /article?page=1&pageSize=10&keyword=搜索词 - 获取文章列表（支持分页和搜索）
   @Get()
   findAllArticle(
     @Query('page') page?: string,
-    @Query('pageSize') pageSize?: string
+    @Query('pageSize') pageSize?: string,
+    @Query('keyword') keyword?: string
   ) {
     const pageNum = page ? parseInt(page, 10) : 1;
     const size = pageSize ? parseInt(pageSize, 10) : 10;
-    return this.articleService.findAllArticle(pageNum, size);
+    return this.articleService.findAllArticle(pageNum, size, keyword);
   }
 
   // GET /article/:id - 获取单篇文章（公开接口）

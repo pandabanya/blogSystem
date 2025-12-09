@@ -10,7 +10,7 @@
           size="large"
         />
         <div class="action-buttons">
-          <el-button>保存草稿</el-button>
+          <el-button @click="handleSaveDraft">保存草稿</el-button>
           <el-button type="primary" @click="handlePublish">发布文章</el-button>
         </div>
       </div>
@@ -101,22 +101,48 @@ const handlePublish = () => {
   publishDialogVisible.value = true
 }
 
-const confirmPublish = async() => {
-  // 只传递后端需要的字段
+const handleSaveDraft = async () => {
+  if (!articleForm.title) {
+    ElMessage.warning('请输入标题')
+    return
+  }
+  
   const data = {
     title: articleForm.title,
     content: articleForm.content,
-    author: '管理员', // 或者从用户信息中获取
-    tags: articleForm.tags
+    author: '管理员',
+    tags: articleForm.tags,
+    status: 'draft'  
+  }
+  
+  try {
+    const res: any = await createArticle(data)
+    if (res.code === 201) {
+      ElMessage.success('草稿保存成功')
+      router.push('/article/list')
+    }
+  } catch (error) {
+    console.error('保存草稿失败:', error)
+    ElMessage.error('保存失败')
+  }
+}
+
+const confirmPublish = async() => {
+  const data = {
+    title: articleForm.title,
+    content: articleForm.content,
+    author: '管理员', 
+    tags: articleForm.tags,
+    status: 'published'  
   }
   
   console.log('Publish:', data)
   try {
     const res:any = await createArticle(data)
     if (res.code === 201) {
-      ElMessage.success('创建成功')
+      ElMessage.success('发布成功')
       publishDialogVisible.value = false
-      router.push('/article')
+      router.push('/article/list')
     }
   } catch (error) {
     console.error('创建失败:', error)
@@ -126,7 +152,7 @@ const confirmPublish = async() => {
 </script>
 <style scoped>
 .article-create-container {
-  height: calc(100vh - 100px); /* 减去 layout 的 header/padding */
+  height: calc(100vh - 100px); 
 }
 
 /* 覆盖 el-card body 样式，让编辑器尽可能大 */

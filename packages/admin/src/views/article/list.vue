@@ -56,9 +56,10 @@
           </template>
         </el-table-column>
         <el-table-column prop="createTime" label="创建时间" width="180" />
-        <el-table-column label="操作" width="150" fixed="right">
+        <el-table-column label="操作" width="220" fixed="right">
           <template #default="{ row }">
             <el-button link type="primary" size="small" @click="handleEdit(row._id)">编辑</el-button>
+            <el-button link type="success" size="small" @click="handleExport(row._id)">导出</el-button>
             <el-button link type="danger" size="small" @click="handleDelete(row._id)">删除</el-button>
           </template>
         </el-table-column>
@@ -83,7 +84,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { getArticles, deleteArticle } from '@/api/article'
+import { getArticles, deleteArticle, exportArticle } from '@/api/article'
 
 const loading = ref(false)
 const router = useRouter()
@@ -97,9 +98,20 @@ const total = ref(0)
 const handleSearch = async () => {
   loading.value = true
   try {
-    const res:any = await getArticles(currentPage.value, pageSize.value)
+    // 传递搜索关键词
+    const res:any = await getArticles(
+      currentPage.value, 
+      pageSize.value, 
+      searchKeyword.value || undefined
+    )
     if (res.code === 200) {
-      articles.value = res.data.list
+      // 处理文章数据，添加缺失字段
+      articles.value = res.data.list.map((item: any) => ({
+        ...item,
+        category: item.tags?.[0] || '未分类',  // 从 tags 取第一个作为分类
+        status: item.status || 'draft',  // 从后端读取状态，默认为草稿
+        createTime: new Date(item.createdAt).toLocaleString('zh-CN')  // 格式化时间
+      }))
       total.value = res.data.total
     }
   } catch (error) {
@@ -142,6 +154,31 @@ const handleEdit = (id: string) => {
 // 新建文章
 const handleCreate = () => {
   router.push('/article/create')
+}
+
+// 导出文章
+const handleExport = async (id: string) => {
+  try {
+    const res: any = await exportArticle(id)
+    if (res.code === 200) {
+      // 创建 Blob 对象
+      const blob = new Blob([res.data.content], { type: 'text/markdown;charset=utf-8' })
+      // 创建下载链接
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = res.data.filename || 'article.md'
+      document.body.appendChild(a)
+      a.click()
+      // 清理
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+      ElMessage.success('导出成功！')
+    }
+  } catch (error) {
+    console.error('导出失败:', error)
+    ElMessage.error('导出失败')
+  }
 }
 
 onMounted(() => {

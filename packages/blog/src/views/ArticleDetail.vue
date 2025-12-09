@@ -70,6 +70,9 @@
         </aside>
       </div>
 
+      <!-- 评论区 -->
+      <CommentSection v-if="article._id" :articleId="article._id" />
+
     </main>
   </div>
 </template>
@@ -81,6 +84,7 @@ import MarkdownIt from 'markdown-it'
 import hljs from 'highlight.js'
 import 'highlight.js/styles/atom-one-dark.css'
 import Navbar from '../components/Navbar.vue'
+import CommentSection from '../components/CommentSection.vue'
 import { getArticle } from '@/api/article'
 
 const route = useRoute()

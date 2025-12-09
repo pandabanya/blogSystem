@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsArray, MinLength, MaxLength } from 'class-validator';
+import { IsString, IsOptional, IsArray, MinLength, MaxLength, IsIn } from 'class-validator';
 
 // 更新时，所有字段都是可选的（用户可能只改标题，不改内容）
 export class UpdateArticleDto {
@@ -19,4 +19,9 @@ export class UpdateArticleDto {
   @IsOptional()
   @IsArray({ message: '标签必须是数组' })
   tags?: string[];
+
+  @IsOptional()
+  @IsString({ message: '状态必须是字符串' })
+  @IsIn(['draft', 'published'], { message: '状态只能是 draft 或 published' })
+  status?: string;
 }

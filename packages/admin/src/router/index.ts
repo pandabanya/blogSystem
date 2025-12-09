@@ -37,6 +37,42 @@ const routes: RouteRecordRaw[] = [
         name: 'ArticleCreate',
         component: () => import('../views/article/create.vue'),
         meta: { title: '发布文章', icon: 'edit' }
+      },
+      {
+        path: 'article/edit/:id',
+        name: 'ArticleEdit',
+        component: () => import('../views/article/edit.vue'),
+        meta: { title: '编辑文章', icon: 'edit' }
+      },
+      {
+        path: 'tag',
+        name: 'Tag',
+        component: () => import('../views/tag/index.vue'),
+        meta: { title: '标签管理', icon: 'collection-tag' }
+      },
+      {
+        path: 'upload',
+        name: 'Upload',
+        component: () => import('../views/upload/index.vue'),
+        meta: { title: '图片上传', icon: 'upload' }
+      },
+      {
+        path: 'category',
+        name: 'Category',
+        component: () => import('../views/category/index.vue'),
+        meta: { title: '分类管理', icon: 'folder' }
+      },
+      {
+        path: 'comment',
+        name: 'Comment',
+        component: () => import('../views/comment/index.vue'),
+        meta: { title: '评论管理', icon: 'chat-dot-round' }
+      },
+      {
+        path: 'profile',
+        name: 'Profile',
+        component: () => import('../views/profile/index.vue'),
+        meta: { title: '个人中心', icon: 'user' }
       }
     ]
   }

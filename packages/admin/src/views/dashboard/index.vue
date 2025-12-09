@@ -12,52 +12,53 @@
     </el-card>
 
     <!-- 数据概览卡片 -->
-    <el-row :gutter="20" class="data-cards">
-      <el-col :span="6">
-        <el-card shadow="hover">
-          <template #header>
-            <div class="card-header">
-              <span>总访问量</span>
-              <el-tag type="success">日</el-tag>
-            </div>
-          </template>
-          <div class="card-value">25,848</div>
-          <div class="card-footer">日同比 12.5% <el-icon color="red"><CaretTop /></el-icon></div>
-        </el-card>
-      </el-col>
+    <el-row :gutter="20" class="data-cards" v-loading="loading">
       <el-col :span="6">
         <el-card shadow="hover">
           <template #header>
             <div class="card-header">
               <span>文章总数</span>
-              <el-tag>月</el-tag>
+              <el-icon color="#409eff"><Document /></el-icon>
             </div>
           </template>
-          <div class="card-value">128</div>
-          <div class="card-footer">本月新增 4 篇</div>
+          <div class="card-value">{{ stats.totalArticles }}</div>
+          <div class="card-footer">所有文章</div>
         </el-card>
       </el-col>
       <el-col :span="6">
         <el-card shadow="hover">
           <template #header>
             <div class="card-header">
-              <span>评论数</span>
-              <el-tag type="warning">周</el-tag>
+              <span>已发布</span>
+              <el-icon color="#67c23a"><Select /></el-icon>
             </div>
           </template>
-          <div class="card-value">492</div>
-          <div class="card-footer">周同比 5.2% <el-icon color="green"><CaretBottom /></el-icon></div>
+          <div class="card-value">{{ stats.publishedArticles }}</div>
+          <div class="card-footer">正式发布的文章</div>
         </el-card>
       </el-col>
       <el-col :span="6">
         <el-card shadow="hover">
           <template #header>
             <div class="card-header">
-              <span>系统消息</span>
+              <span>草稿箱</span>
+              <el-icon color="#e6a23c"><EditPen /></el-icon>
             </div>
           </template>
-          <div class="card-value">8</div>
-          <div class="card-footer">未读消息</div>
+          <div class="card-value">{{ stats.draftArticles }}</div>
+          <div class="card-footer">草稿状态文章</div>
+        </el-card>
+      </el-col>
+      <el-col :span="6">
+        <el-card shadow="hover">
+          <template #header>
+            <div class="card-header">
+              <span>总浏览量</span>
+              <el-icon color="#f56c6c"><View /></el-icon>
+            </div>
+          </template>
+          <div class="card-value">{{ stats.totalViews }}</div>
+          <div class="card-footer">累计浏览次数</div>
         </el-card>
       </el-col>
     </el-row>
@@ -69,10 +70,7 @@
           <template #header>
             <span>访问趋势</span>
           </template>
-          <div class="chart-placeholder">
-            <!-- 这里后续会放 ECharts -->
-            图表区域 (ECharts Placeholder)
-          </div>
+          <div ref="chartRef" class="chart-container"></div>
         </el-card>
       </el-col>
       <el-col :span="8">
@@ -81,9 +79,18 @@
             <span>快捷操作</span>
           </template>
           <div class="quick-actions">
-            <el-button type="primary" icon="Edit">发布文章</el-button>
-            <el-button type="success" icon="Picture">上传图片</el-button>
-            <el-button type="warning" icon="Setting">系统设置</el-button>
+            <el-button type="primary" icon="Edit" @click="router.push('/article/create')">
+              发布文章
+            </el-button>
+            <el-button type="success" icon="Picture" @click="router.push('/upload')">
+              上传图片
+            </el-button>
+            <el-button type="info" icon="Document" @click="router.push('/article/list')">
+              文章列表
+            </el-button>
+            <el-button type="warning" icon="User" @click="router.push('/profile')">
+              个人中心
+            </el-button>
           </div>
         </el-card>
       </el-col>
@@ -92,9 +99,107 @@
 </template>
 
 <script setup lang="ts">
-// import { CaretTop, CaretBottom, Edit, Picture, Setting } from '@element-plus/icons-vue'
-// 注意：图标需要先导入。如果你在 main.ts 里没有全局注册图标组件，这里需要按需导入。
-// 或者我们在 main.ts 里统一注册所有图标（推荐做法，见下一步）。
+import { ref, onMounted, nextTick } from 'vue'
+import { useRouter } from 'vue-router'
+import { getArticleStats } from '@/api/article'
+import * as echarts from 'echarts'
+
+const router = useRouter()
+const loading = ref(false)
+const chartRef = ref()
+const stats = ref({
+  totalArticles: 0,
+  publishedArticles: 0,
+  draftArticles: 0,
+  totalViews: 0
+})
+
+// 初始化图表
+const initChart = () => {
+  if (!chartRef.value) return
+
+  const chart = echarts.init(chartRef.value)
+  
+  // 生成近7天的日期
+  const dates = []
+  const views = []
+  for (let i = 6; i >= 0; i--) {
+    const date = new Date()
+    date.setDate(date.getDate() - i)
+    dates.push(`${date.getMonth() + 1}/${date.getDate()}`)
+    // 模拟数据：随机生成浏览量
+    views.push(Math.floor(Math.random() * 100) + 50)
+  }
+
+  const option = {
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: {
+        type: 'shadow'
+      }
+    },
+    grid: {
+      left: '3%',
+      right: '4%',
+      bottom: '3%',
+      containLabel: true
+    },
+    xAxis: {
+      type: 'category',
+      data: dates,
+      axisTick: {
+        alignWithLabel: true
+      }
+    },
+    yAxis: {
+      type: 'value'
+    },
+    series: [
+      {
+        name: '访问量',
+        type: 'line',
+        smooth: true,
+        data: views,
+        itemStyle: {
+          color: '#409eff'
+        },
+        areaStyle: {
+          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+            { offset: 0, color: 'rgba(64, 158, 255, 0.3)' },
+            { offset: 1, color: 'rgba(64, 158, 255, 0.05)' }
+          ])
+        }
+      }
+    ]
+  }
+
+  chart.setOption(option)
+
+  // 响应式调整
+  window.addEventListener('resize', () => {
+    chart.resize()
+  })
+}
+
+const loadStats = async () => {
+  loading.value = true
+  try {
+    const res: any = await getArticleStats()
+    if (res.code === 200) {
+      stats.value = res.data
+    }
+  } catch (error) {
+    console.error('加载统计数据失败:', error)
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(async () => {
+  await loadStats()
+  await nextTick()
+  initChart()
+})
 </script>
 
 <style scoped>
@@ -143,13 +248,9 @@
 .main-row {
   margin-top: 20px;
 }
-.chart-placeholder {
+.chart-container {
   height: 300px;
-  background-color: #f5f7fa;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #909399;
+  width: 100%;
 }
 .quick-actions {
   display: flex;
@@ -157,6 +258,7 @@
   gap: 15px;
 }
 .quick-actions .el-button {
-  margin-left: 0; 
+  margin-left: 0;
+  width: 100%;
 }
 </style>

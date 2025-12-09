@@ -191,20 +191,23 @@ const currentCategory = ref('全部')
 const articles = ref<any[]>([])
 const fetchArticles = async () => {
   try {
-    const res: any = await getArticles()
+    const res: any = await getArticles(1, 100) // 获取前 100 篇文章
     if (res.code === 200) {
-      // 转换后端数据格式为前端需要的格式
-      articles.value = res.data.map((item: any) => ({
-        id: item._id,  // MongoDB 的 _id 转为 id
-        title: item.title,
-        summary: item.content.substring(0, 100) + '...',  // 截取前100字作为摘要
-        tags: item.tags,
-        date: new Date(item.createdAt).toLocaleDateString('zh-CN'),  // 格式化日期
-        views: item.views,
-        category: item.tags[0] || '未分类',  // 用第一个标签作为分类
-        emoji: getRandomEmoji(),  // 随机生成 emoji
-        coverColor: getRandomColor()  // 随机生成背景色
-      }))
+      // 适配分页数据格式：res.data.list
+      const articleList = res.data.list || res.data || []
+      articles.value = articleList
+        .filter((item: any) => item.status === 'published') // 只显示已发布的文章
+        .map((item: any) => ({
+          id: item._id,  // MongoDB 的 _id 转为 id
+          title: item.title,
+          summary: item.content.substring(0, 100) + '...',  // 截取前100字作为摘要
+          tags: item.tags,
+          date: new Date(item.createdAt).toLocaleDateString('zh-CN'),  // 格式化日期
+          views: item.views,
+          category: item.tags[0] || '未分类',  // 用第一个标签作为分类
+          emoji: getRandomEmoji(),  // 随机生成 emoji
+          coverColor: getRandomColor()  // 随机生成背景色
+        }))
     }
   } catch (error) {
     console.error('获取文章失败:', error)
