@@ -64,11 +64,15 @@
 <script setup lang="ts">
 import { ref, reactive } from 'vue'
 import { Editor } from '@bytemd/vue-next'
+import { useRouter } from 'vue-router'
 import gfm from '@bytemd/plugin-gfm'
 import highlight from '@bytemd/plugin-highlight'
+import { ElMessage } from 'element-plus'
+import { createArticle } from '@/api/article'
 // import zhHans from 'bytemd/locales/zh_Hans.json' // 删除这行
 import 'bytemd/dist/index.css'
 import 'highlight.js/styles/vs.css'
+const router = useRouter()
 
 const plugins = [
   gfm(),
@@ -97,8 +101,17 @@ const handlePublish = () => {
   publishDialogVisible.value = true
 }
 
-const confirmPublish = () => {
+const confirmPublish = async() => {
   console.log('Publish:', articleForm)
+  try {
+    const res:any = await createArticle(articleForm)
+    if (res.code === 201) {
+      ElMessage.success('创建成功')
+      router.push('/article')
+    }
+  } catch (error) {
+    console.error('创建失败:', error)
+  }
   publishDialogVisible.value = false
   alert('发布成功！')
 }

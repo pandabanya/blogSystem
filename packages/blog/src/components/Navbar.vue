@@ -1,45 +1,84 @@
 <template>
-  <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-200">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+  <nav class="sticky top-0 z-50 bg-gray-900/80 backdrop-blur-md border-b border-gray-800 shadow-lg">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between items-center h-16">
         <!-- Logo -->
-        <router-link to="/" class="flex items-center space-x-2">
-          <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg"></div>
-          <span class="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            DevBlog
-          </span>
+        <router-link to="/" class="flex items-center space-x-2 group">
+          <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg group-hover:scale-110 transition-transform shadow-lg"></div>
+          <span class="text-xl font-bold text-white">我的博客</span>
         </router-link>
 
-        <!-- Navigation Links -->
-        <div class="hidden md:flex space-x-8">
+        <!-- 桌面端导航 -->
+        <div class="hidden md:flex items-center space-x-8">
+          <router-link to="/" class="nav-link">首页</router-link>
+          <router-link to="/about" class="nav-link">关于</router-link>
+        </div>
+
+        <!-- 移动端菜单按钮 -->
+        <button 
+          @click="mobileMenuOpen = !mobileMenuOpen"
+          class="md:hidden p-2 text-gray-300 hover:text-white transition-colors"
+        >
+          <svg v-if="!mobileMenuOpen" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+          </svg>
+          <svg v-else class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+
+      <!-- 移动端菜单 -->
+      <transition name="slide-down">
+        <div v-if="mobileMenuOpen" class="md:hidden py-4 space-y-2">
           <router-link 
             to="/" 
-            class="text-gray-700 hover:text-blue-600 transition-colors font-medium"
+            class="mobile-nav-link"
+            @click="mobileMenuOpen = false"
           >
             首页
           </router-link>
           <router-link 
             to="/about" 
-            class="text-gray-700 hover:text-blue-600 transition-colors font-medium"
+            class="mobile-nav-link"
+            @click="mobileMenuOpen = false"
           >
             关于
           </router-link>
         </div>
-
-        <!-- Search & Theme Toggle -->
-        <div class="flex items-center space-x-4">
-          <button class="p-2 rounded-lg hover:bg-gray-100 transition-colors">
-            <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-            </svg>
-          </button>
-          <button class="p-2 rounded-lg hover:bg-gray-100 transition-colors">
-            <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
-            </svg>
-          </button>
-        </div>
-      </div>
+      </transition>
     </div>
   </nav>
 </template>
+
+<script setup lang="ts">
+import { ref } from 'vue'
+
+const mobileMenuOpen = ref(false)
+</script>
+
+<style scoped>
+.nav-link {
+  @apply text-gray-300 hover:text-blue-400 transition-colors font-medium;
+}
+
+.mobile-nav-link {
+  @apply block px-4 py-3 text-gray-300 hover:text-blue-400 hover:bg-gray-800/50 rounded-lg transition-all;
+}
+
+/* 移动菜单动画 */
+.slide-down-enter-active,
+.slide-down-leave-active {
+  transition: all 0.3s ease;
+}
+
+.slide-down-enter-from {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+.slide-down-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+</style>

@@ -5,6 +5,12 @@
     "types": ["vite/client"],
     "resolveJsonModule": true, 
     "esModuleInterop": true,
+    
+    /* 路径别名配置 - 让 TypeScript 识别 @ 符号 */
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    },
 
     /* Linting */
     "strict": true,

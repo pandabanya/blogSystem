@@ -4,17 +4,20 @@ const routes = [
   {
     path: '/',
     name: 'Home',
-    component: () => import('../views/Home.vue')
+    component: () => import('../views/Home.vue'),
+    meta: { transition: 'fade' } // 淡入淡出
   },
   {
     path: '/article/:id',
     name: 'ArticleDetail',
-    component: () => import('../views/ArticleDetail.vue')
+    component: () => import('../views/ArticleDetail.vue'),
+    meta: { transition: 'slide' } // 滑动
   },
   {
     path: '/about',
     name: 'About',
-    component: () => import('../views/About.vue')
+    component: () => import('../views/About.vue'),
+    meta: { transition: 'scale' } // 缩放
   }
 ]
 
