@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put, Delete, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Delete, UseGuards, Query } from '@nestjs/common';
 import { ArticleService } from './article.service';
 import { CreateArticleDto } from './dto/create-article.dto';
 import { UpdateArticleDto } from './dto/update-article.dto';
@@ -9,10 +9,15 @@ import { CurrentUser } from '../auth/user.decorator';
 export class ArticleController {
   constructor(private readonly articleService: ArticleService) {}
 
-  // GET /article - 获取所有文章（公开接口）
+  // GET /article?page=1&pageSize=10 - 获取文章列表（支持分页）
   @Get()
-  findAllArticle() {
-    return this.articleService.findAllArticle();
+  findAllArticle(
+    @Query('page') page?: string,
+    @Query('pageSize') pageSize?: string
+  ) {
+    const pageNum = page ? parseInt(page, 10) : 1;
+    const size = pageSize ? parseInt(pageSize, 10) : 10;
+    return this.articleService.findAllArticle(pageNum, size);
   }
 
   // GET /article/:id - 获取单篇文章（公开接口）

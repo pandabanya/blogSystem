@@ -18,7 +18,7 @@ async function bootstrap() {
       'http://localhost:3000',
       'http://localhost:3001',
       'https://blog-system-blog.vercel.app',  // 替换为你的 Vercel 域名
-      'https://blog-system-admin-klmu.vercel.app'
+      'https://blog-system-admin.vercel.app'
     ],
     credentials: true
   });

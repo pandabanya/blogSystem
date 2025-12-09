@@ -12,14 +12,31 @@ export class ArticleService {
     //  ↑ 注入 Article 模型
   ) {}
 
-  // 获取所有文章
-  async findAllArticle() {
-    const articles = await this.articleModel.find().exec();
-    //                      ↑ 查询所有文档
+  // 获取文章列表（支持分页）
+  async findAllArticle(page: number = 1, pageSize: number = 10) {
+    // 计算跳过的文档数量
+    const skip = (page - 1) * pageSize;
+    
+    // 查询文章列表和总数
+    const [articles, total] = await Promise.all([
+      this.articleModel.find()
+        .sort({ createdAt: -1 })  // 按创建时间倒序
+        .skip(skip)
+        .limit(pageSize)
+        .exec(),
+      this.articleModel.countDocuments().exec()  // 总数
+    ]);
+    
     return {
       code: 200,
       message: 'success',
-      data: articles
+      data: {
+        list: articles,
+        total,
+        page,
+        pageSize,
+        totalPages: Math.ceil(total / pageSize)
+      }
     };
   }
 

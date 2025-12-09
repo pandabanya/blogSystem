@@ -1,8 +1,10 @@
 import request from '@/utils/request'
 
-// 获取文章列表
-export const getArticles = () => {
-  return request.get('/article')
+// 获取文章列表（支持分页）
+export const getArticles = (page: number = 1, pageSize: number = 10) => {
+  return request.get('/article', {
+    params: { page, pageSize }
+  })
 }
 
 // 获取单篇文章

@@ -9,6 +9,12 @@ const routes: RouteRecordRaw[] = [
     meta: { hidden: true }
   },
   {
+    path: '/register',
+    name: 'Register',
+    component: () => import('../views/register/index.vue'),
+    meta: { hidden: true }
+  },
+  {
     path: '/',
     component: Layout,
     redirect: '/dashboard',

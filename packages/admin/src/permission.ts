@@ -2,7 +2,7 @@ import router from './router'
 import { useUserStore } from './stores/user'
 import type { RouteLocationNormalized } from 'vue-router'
 
-const whiteList = ['/login'] // 白名单，不需要登录也能访问
+const whiteList = ['/login', '/register'] // 白名单，不需要登录也能访问
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 router.beforeEach((to: RouteLocationNormalized, _from:RouteLocationNormalized, next:any)=>{

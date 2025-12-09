@@ -63,6 +63,11 @@ const handleLogin = async () => {
             登录
           </el-button>
         </el-form-item>
+        <el-form-item>
+          <div class="footer-links">
+            还没有账号？<router-link to="/register" class="link">立即注册</router-link>
+          </div>
+        </el-form-item>
       </el-form>
     </div>
   </div>
@@ -90,5 +95,21 @@ const handleLogin = async () => {
   margin-bottom: 30px;
   font-size: 24px;
   color: #333;
+}
+
+.footer-links {
+  text-align: center;
+  font-size: 14px;
+  color: #666;
+}
+
+.link {
+  color: #409eff;
+  text-decoration: none;
+  margin-left: 5px;
+}
+
+.link:hover {
+  text-decoration: underline;
 }
 </style>

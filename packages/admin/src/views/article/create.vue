@@ -102,18 +102,26 @@ const handlePublish = () => {
 }
 
 const confirmPublish = async() => {
-  console.log('Publish:', articleForm)
+  // 只传递后端需要的字段
+  const data = {
+    title: articleForm.title,
+    content: articleForm.content,
+    author: '管理员', // 或者从用户信息中获取
+    tags: articleForm.tags
+  }
+  
+  console.log('Publish:', data)
   try {
-    const res:any = await createArticle(articleForm)
+    const res:any = await createArticle(data)
     if (res.code === 201) {
       ElMessage.success('创建成功')
+      publishDialogVisible.value = false
       router.push('/article')
     }
   } catch (error) {
     console.error('创建失败:', error)
+    ElMessage.error('发布失败')
   }
-  publishDialogVisible.value = false
-  alert('发布成功！')
 }
 </script>
 <style scoped>

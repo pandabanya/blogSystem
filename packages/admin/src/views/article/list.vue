@@ -67,9 +67,12 @@
       <!-- 分页 -->
       <div class="pagination-container">
         <el-pagination
+          v-model:current-page="currentPage"
+          :page-size="pageSize"
+          :total="total"
           background
-          layout="prev, pager, next"
-          :total="100"
+          layout="total, prev, pager, next"
+          @current-change="handlePageChange"
         />
       </div>
     </el-card>
@@ -82,21 +85,34 @@ import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { getArticles, deleteArticle } from '@/api/article'
 
-const loading = false
+const loading = ref(false)
 const router = useRouter()
 const articles = ref([])
 const searchKeyword = ref('')
+const currentPage = ref(1)
+const pageSize = ref(10)
+const total = ref(0)
 
 // 获取文章列表
 const handleSearch = async () => {
+  loading.value = true
   try {
-    const res:any = await getArticles()
+    const res:any = await getArticles(currentPage.value, pageSize.value)
     if (res.code === 200) {
-      articles.value = res.data
+      articles.value = res.data.list
+      total.value = res.data.total
     }
   } catch (error) {
     console.error('获取文章失败:', error)
+  } finally {
+    loading.value = false
   }
+}
+
+// 分页改变
+const handlePageChange = (page: number) => {
+  currentPage.value = page
+  handleSearch()
 }
 
 // 删除文章
